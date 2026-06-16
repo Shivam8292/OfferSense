@@ -55,14 +55,23 @@ Rules:
 """
 
     client = get_groq_client()
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}],
-        max_tokens=1500,
-        temperature=0.3
-    )
-    
-    result_text = response.choices[0].message.content.strip()
+    import time
+    last_error = None
+    for attempt in range(2):
+        try:
+            response = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=1500,
+                temperature=0.3
+            )
+            result_text = response.choices[0].message.content.strip()
+            break
+        except Exception as e:
+            last_error = e
+            if attempt == 1:
+                raise RuntimeError(f"Groq API negotiation analysis failed after 2 attempts: {str(e)}")
+            time.sleep(1)
     
     # Strip markdown block formatting if present
     if result_text.startswith("```json"):

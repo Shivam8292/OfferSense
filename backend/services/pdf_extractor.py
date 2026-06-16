@@ -42,14 +42,23 @@ Offer Letter Text:
 """
     
     client = get_groq_client()
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}],
-        max_tokens=500,
-        temperature=0.1
-    )
-    
-    result = response.choices[0].message.content.strip()
+    import time
+    last_error = None
+    for attempt in range(2):
+        try:
+            response = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=500,
+                temperature=0.1
+            )
+            result = response.choices[0].message.content.strip()
+            break
+        except Exception as e:
+            last_error = e
+            if attempt == 1:
+                raise RuntimeError(f"Groq API details extraction failed after 2 attempts: {str(e)}")
+            time.sleep(1)
     
     # Clean up Markdown code block wrapping if LLM returned it
     if result.startswith("```json"):
