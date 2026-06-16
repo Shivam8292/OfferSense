@@ -125,7 +125,7 @@ export default function ResultsPage({ results, onReset }) {
             {/* Bar 2: Market Average */}
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-semibold">
-                <span className="text-textSecondary">Market Average (AmbitionBox)</span>
+                <span className="text-textSecondary">Market Average ({market.source || "Market Data"})</span>
                 <span className="font-extrabold text-textSecondary">₹{avgCTC} LPA</span>
               </div>
               <div className="w-full bg-[#1E1E1E] h-8 rounded-md overflow-hidden flex items-center">
