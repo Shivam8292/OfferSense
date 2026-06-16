@@ -37,11 +37,17 @@ export default function InputPage({ isLoading, setIsLoading, onResult }) {
     setDragActive(false)
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0]
-      if (file.type === "application/pdf") {
+      const isValidType = file.type === "application/pdf" || 
+                          file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || 
+                          file.name.toLowerCase().endsWith(".docx") ||
+                          file.type.startsWith("image/") ||
+                          /\.(jpe?g|png)$/i.test(file.name)
+      
+      if (isValidType) {
         setSelectedFile(file)
         setErrorMsg("")
       } else {
-        setErrorMsg("Only PDF files are accepted.")
+        setErrorMsg("Only PDF, DOCX, and images (JPG/PNG) are accepted.")
       }
     }
   }
@@ -49,11 +55,17 @@ export default function InputPage({ isLoading, setIsLoading, onResult }) {
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
-      if (file.type === "application/pdf") {
+      const isValidType = file.type === "application/pdf" || 
+                          file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || 
+                          file.name.toLowerCase().endsWith(".docx") ||
+                          file.type.startsWith("image/") ||
+                          /\.(jpe?g|png)$/i.test(file.name)
+      
+      if (isValidType) {
         setSelectedFile(file)
         setErrorMsg("")
       } else {
-        setErrorMsg("Only PDF files are accepted.")
+        setErrorMsg("Only PDF, DOCX, and images (JPG/PNG) are accepted.")
       }
     }
   }
@@ -167,7 +179,7 @@ export default function InputPage({ isLoading, setIsLoading, onResult }) {
                 : "border-transparent text-textSecondary hover:text-textPrimary"
             }`}
           >
-            Upload PDF
+            Upload Document
           </button>
           <button
             onClick={() => { setActiveTab("manual"); setErrorMsg("") }}
@@ -200,7 +212,7 @@ export default function InputPage({ isLoading, setIsLoading, onResult }) {
                   type="file"
                   ref={fileInputRef}
                   onChange={handleFileChange}
-                  accept="application/pdf"
+                  accept=".pdf,.docx,.jpg,.jpeg,.png,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png"
                   className="hidden"
                 />
 
@@ -216,7 +228,7 @@ export default function InputPage({ isLoading, setIsLoading, onResult }) {
                   </div>
                 ) : (
                   <div className="text-center">
-                    <p className="text-sm font-semibold">Drop your offer letter PDF here</p>
+                    <p className="text-sm font-semibold">Drop your offer letter PDF, DOCX, or Image (JPG/PNG) here</p>
                     <p className="text-xs text-textSecondary mt-1">or click to browse from files</p>
                   </div>
                 )}

@@ -28,22 +28,24 @@ def build_response(extracted: dict, market: dict, analysis: dict) -> dict:
 @router.post("/pdf")
 @limiter.limit("10/minute")
 async def analyze_pdf(request: Request, file: UploadFile = File(...)):
-    if not file.filename.endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only PDF files accepted")
+    filename_lower = file.filename.lower()
+    allowed_extensions = (".pdf", ".docx", ".jpg", ".jpeg", ".png")
+    if not filename_lower.endswith(allowed_extensions):
+        raise HTTPException(status_code=400, detail="Only PDF, DOCX, and images (JPG/PNG) are accepted")
     
     # Check file size (max 10MB)
     MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
-    pdf_bytes = await file.read()
-    if len(pdf_bytes) > MAX_FILE_SIZE:
+    file_bytes = await file.read()
+    if len(file_bytes) > MAX_FILE_SIZE:
         raise HTTPException(status_code=400, detail="File too large. Maximum size allowed is 10MB.")
     
     try:
-        extracted = extract_offer_details(pdf_bytes)
+        extracted = extract_offer_details(file_bytes, file.filename)
     except Exception as e:
         raise HTTPException(status_code=422, detail=f"Could not extract offer details: {str(e)}")
     
     if not extracted.get("ctc_lpa"):
-        raise HTTPException(status_code=422, detail="Could not find CTC in the PDF. Please use manual entry.")
+        raise HTTPException(status_code=422, detail="Could not find CTC in the document. Please use manual entry.")
     
     # Use defaults if any fields are empty/null from LLM
     role = extracted.get("role") or "Software Engineer"
