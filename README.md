@@ -1,6 +1,6 @@
 <div align="center">
 
-![OfferSense Banner](assets/banner.png)
+<img src="assets/banner.png" alt="OfferSense Banner" width="700"/>
 
 # OfferSense 💼
 
